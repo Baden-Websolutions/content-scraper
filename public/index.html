@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Scraper - Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: normal;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-running { background: #4caf50; }
+        .status-completed { background: #2196f3; }
+        .status-failed { background: #f44336; }
+        .status-cancelled { background: #ff9800; }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .job-item {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .job-item:hover {
+            border-color: #667eea;
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .job-url {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .job-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .live-log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .live-log .log-entry {
+            margin-bottom: 5px;
+        }
+
+        .live-log .log-time {
+            color: #888;
+            margin-right: 10px;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulsing {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connectionStatus">
+        <span class="status-indicator status-running"></span>
+        <span>Connecting...</span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Content Scraper</h1>
+            <p>Universal Web Crawler for Nuxt.js, Storyblok & SAP Commerce Cloud</p>
+        </div>
+
+        <!-- Configuration Form -->
+        <div class="card">
+            <h2>⚙️ Configuration</h2>
+            <form id="scraperForm">
+                <div class="form-group">
+                    <label for="baseUrl">Base URL *</label>
+                    <input type="url" id="baseUrl" name="baseUrl" placeholder="https://lenzingpro.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="maxPages">Maximum Pages</label>
+                    <input type="number" id="maxPages" name="maxPages" value="50" min="1" max="1000">
+                </div>
+
+                <div class="form-group">
+                    <label for="delay">Delay Between Requests (ms)</label>
+                    <input type="number" id="delay" name="delay" value="1000" min="0" max="10000" step="100">
+                </div>
+
+                <div class="form-group">
+                    <label>Export Formats</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="formats" value="json" checked> JSON</label>
+                        <label><input type="checkbox" name="formats" value="storyblok"> Storyblok</label>
+                        <label><input type="checkbox" name="formats" value="nuxt"> Nuxt.js</label>
+                        <label><input type="checkbox" name="formats" value="sap-cc"> SAP Commerce</label>
+                        <label><input type="checkbox" name="formats" value="sitemap"> Sitemap</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><input type="checkbox" name="downloadImages"> Download Images</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="startBtn">
+                    🚀 Start Scraping
+                </button>
+            </form>
+        </div>
+
+        <!-- Active Job -->
+        <div class="card" id="activeJobCard" style="display: none;">
+            <h2>📊 Active Job</h2>
+            <div id="activeJobContent"></div>
+        </div>
+
+        <!-- Live Log -->
+        <div class="card" id="liveLogCard" style="display: none;">
+            <h2>📝 Live Log</h2>
+            <div class="live-log" id="liveLog"></div>
+        </div>
+
+        <!-- Job History -->
+        <div class="card">
+            <h2>📜 Job History</h2>
+            <div id="jobHistory">
+                <p style="color: #999;">No jobs yet. Start your first scraping job above!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let currentJobId = null;
+
+        // Initialize WebSocket connection
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}`);
+
+            ws.onopen = () => {
+                updateConnectionStatus(true);
+                console.log('WebSocket connected');
+            };
+
+            ws.onclose = () => {
+                updateConnectionStatus(false);
+                console.log('WebSocket disconnected');
+                setTimeout(connectWebSocket, 3000);
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                handleWebSocketMessage(message);
+            };
+        }
+
+        // Update connection status indicator
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            const indicator = statusEl.querySelector('.status-indicator');
+            const text = statusEl.querySelector('span:last-child');
+
+            if (connected) {
+                indicator.className = 'status-indicator status-running';
+                text.textContent = 'Connected';
+            } else {
+                indicator.className = 'status-indicator status-failed';
+                text.textContent = 'Disconnected';
+            }
+        }
+
+        // Handle WebSocket messages
+        function handleWebSocketMessage(message) {
+            switch (message.type) {
+                case 'init':
+                    updateJobHistory(message.data.history);
+                    break;
+                case 'job_update':
+                    updateActiveJob(message.data);
+                    break;
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('scraperForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const config = {
+                baseUrl: formData.get('baseUrl'),
+                maxPages: parseInt(formData.get('maxPages')),
+                delay: parseInt(formData.get('delay')),
+                formats: formData.getAll('formats'),
+                downloadImages: formData.get('downloadImages') === 'on'
+            };
+
+            try {
+                const startBtn = document.getElementById('startBtn');
+                startBtn.disabled = true;
+                startBtn.textContent = '⏳ Starting...';
+
+                const response = await fetch('/api/scrape', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                const result = await response.json();
+
+                if (result.jobId) {
+                    currentJobId = result.jobId;
+                    document.getElementById('activeJobCard').style.display = 'block';
+                    document.getElementById('liveLogCard').style.display = 'block';
+                    addLogEntry('Job started: ' + result.jobId);
+
+                    // Subscribe to job updates
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'subscribe', jobId: result.jobId }));
+                    }
+                }
+
+                startBtn.disabled = false;
+                startBtn.textContent = '🚀 Start Scraping';
+
+            } catch (error) {
+                console.error('Error starting job:', error);
+                alert('Error starting scraping job: ' + error.message);
+                
+                const startBtn = document.getElementById('startBtn');
+                startBtn.disabled = false;
+                startBtn.textContent = '🚀 Start Scraping';
+            }
+        });
+
+        // Update active job display
+        function updateActiveJob(job) {
+            const content = document.getElementById('activeJobContent');
+            const progress = job.progress || {};
+            const percentage = progress.total > 0 
+                ? Math.round((progress.current / progress.total) * 100)
+                : 0;
+
+            content.innerHTML = `
+                <div class="job-header">
+                    <div class="job-url">${job.config.baseUrl}</div>
+                    <div>
+                        <span class="status-indicator status-${job.status}"></span>
+                        ${job.status}
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${percentage}%">
+                        ${percentage}%
+                    </div>
+                </div>
+                <div class="job-meta">
+                    Current: ${progress.currentUrl || 'N/A'}<br>
+                    Progress: ${progress.current || 0} / ${progress.total || 0} pages
+                </div>
+                ${job.result ? `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${job.result.totalPages}</div>
+                            <div class="stat-label">Pages</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${job.result.totalWords}</div>
+                            <div class="stat-label">Words</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${job.result.exports.length}</div>
+                            <div class="stat-label">Exports</div>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            addLogEntry(`Progress: ${progress.current}/${progress.total} - ${progress.currentUrl}`);
+
+            if (job.status === 'completed' || job.status === 'failed') {
+                setTimeout(() => {
+                    loadJobHistory();
+                }, 2000);
+            }
+        }
+
+        // Add entry to live log
+        function addLogEntry(message) {
+            const log = document.getElementById('liveLog');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${time}]</span>${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Update job history
+        function updateJobHistory(jobs) {
+            const historyEl = document.getElementById('jobHistory');
+            
+            if (!jobs || jobs.length === 0) {
+                historyEl.innerHTML = '<p style="color: #999;">No jobs yet.</p>';
+                return;
+            }
+
+            historyEl.innerHTML = jobs.reverse().map(job => `
+                <div class="job-item">
+                    <div class="job-header">
+                        <div class="job-url">${job.config.baseUrl}</div>
+                        <div>
+                            <span class="status-indicator status-${job.status}"></span>
+                            ${job.status}
+                        </div>
+                    </div>
+                    <div class="job-meta">
+                        Started: ${new Date(job.startedAt).toLocaleString()}
+                        ${job.result ? `| Pages: ${job.result.totalPages}` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load job history
+        async function loadJobHistory() {
+            try {
+                const response = await fetch('/api/jobs');
+                const data = await response.json();
+                updateJobHistory(data.history);
+            } catch (error) {
+                console.error('Error loading job history:', error);
+            }
+        }
+
+        // Initialize
+        connectWebSocket();
+        loadJobHistory();
+    </script>
+</body>
+</html>

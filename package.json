@@ -1,0 +1,42 @@
+{
+  "name": "content-scraper",
+  "version": "1.0.0",
+  "description": "Universal web content scraper optimized for Nuxt.js, Storyblok, and SAP Commerce Cloud with live tracking UI",
+  "main": "index.js",
+  "bin": {
+    "content-scraper": "./cli.js"
+  },
+  "scripts": {
+    "start": "node cli.js",
+    "scrape": "node cli.js",
+    "server": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "scraper",
+    "web-scraper",
+    "content-scraper",
+    "nuxt",
+    "nuxtjs",
+    "storyblok",
+    "sap-commerce",
+    "sap-cc",
+    "hybris",
+    "puppeteer",
+    "cheerio",
+    "crawler",
+    "web-crawler"
+  ],
+  "author": "Baden Websolutions",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "cheerio": "^1.0.0-rc.12",
+    "express": "^4.18.0",
+    "ws": "^8.14.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
